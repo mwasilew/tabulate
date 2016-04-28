@@ -94,7 +94,7 @@ DataRow = namedtuple("DataRow", ["begin", "sep", "end"])
 #
 TableFormat = namedtuple("TableFormat", ["lineabove", "linebelowheader",
                                          "linebetweenrows", "linebelow",
-                                         "headerrow", "datarow",
+                                         "headerrow", "datarow", "footerrow",
                                          "padding", "with_header_hide"])
 
 
@@ -216,6 +216,7 @@ _table_formats = {"simple":
                               linebelow=Line("", "-", "  ", ""),
                               headerrow=DataRow("", "  ", ""),
                               datarow=DataRow("", "  ", ""),
+                              footerrow=DataRow("", "  ", ""),
                               padding=0,
                               with_header_hide=["lineabove", "linebelow"]),
                   "plain":
@@ -223,6 +224,7 @@ _table_formats = {"simple":
                               linebetweenrows=None, linebelow=None,
                               headerrow=DataRow("", "  ", ""),
                               datarow=DataRow("", "  ", ""),
+                              footerrow=DataRow("", "  ", ""),
                               padding=0, with_header_hide=None),
                   "grid":
                   TableFormat(lineabove=Line("+", "-", "+", "+"),
@@ -231,6 +233,7 @@ _table_formats = {"simple":
                               linebelow=Line("+", "-", "+", "+"),
                               headerrow=DataRow("|", "|", "|"),
                               datarow=DataRow("|", "|", "|"),
+                              footerrow=DataRow("|", "|", "|"),
                               padding=1, with_header_hide=None),
                   "fancy_grid":
                   TableFormat(lineabove=Line("╒", "═", "╤", "╕"),
@@ -239,6 +242,7 @@ _table_formats = {"simple":
                               linebelow=Line("╘", "═", "╧", "╛"),
                               headerrow=DataRow("│", "│", "│"),
                               datarow=DataRow("│", "│", "│"),
+                              footerrow=DataRow("│", "│", "│"),
                               padding=1, with_header_hide=None),
                   "pipe":
                   TableFormat(lineabove=_pipe_line_with_colons,
@@ -247,6 +251,7 @@ _table_formats = {"simple":
                               linebelow=None,
                               headerrow=DataRow("|", "|", "|"),
                               datarow=DataRow("|", "|", "|"),
+                              footerrow=DataRow("|", "|", "|"),
                               padding=1,
                               with_header_hide=["lineabove"]),
                   "orgtbl":
@@ -256,6 +261,7 @@ _table_formats = {"simple":
                               linebelow=None,
                               headerrow=DataRow("|", "|", "|"),
                               datarow=DataRow("|", "|", "|"),
+                              footerrow=DataRow("|", "|", "|"),
                               padding=1, with_header_hide=None),
                   "jira":
                   TableFormat(lineabove=None,
@@ -264,6 +270,7 @@ _table_formats = {"simple":
                               linebelow=None,
                               headerrow=DataRow("||", "||", "||"),
                               datarow=DataRow("|", "|", "|"),
+                              footerrow=DataRow("||", "||", "||"),
                               padding=1, with_header_hide=None),
                   "psql":
                   TableFormat(lineabove=Line("+", "-", "+", "+"),
@@ -272,6 +279,7 @@ _table_formats = {"simple":
                               linebelow=Line("+", "-", "+", "+"),
                               headerrow=DataRow("|", "|", "|"),
                               datarow=DataRow("|", "|", "|"),
+                              footerrow=DataRow("|", "|", "|"),
                               padding=1, with_header_hide=None),
                   "rst":
                   TableFormat(lineabove=Line("", "=", "  ", ""),
@@ -280,6 +288,7 @@ _table_formats = {"simple":
                               linebelow=Line("", "=", "  ", ""),
                               headerrow=DataRow("", "  ", ""),
                               datarow=DataRow("", "  ", ""),
+                              footerrow=DataRow("", "  ", ""),
                               padding=0, with_header_hide=None),
                   "mediawiki":
                   TableFormat(lineabove=Line("{| class=\"wikitable\" style=\"text-align: left;\"",
@@ -289,6 +298,7 @@ _table_formats = {"simple":
                               linebelow=Line("|}", "", "", ""),
                               headerrow=partial(_mediawiki_row_with_attrs, "!"),
                               datarow=partial(_mediawiki_row_with_attrs, "|"),
+                              footerrow=partial(_mediawiki_row_with_attrs, "!"),
                               padding=0, with_header_hide=None),
                   "moinmoin":
                   TableFormat(lineabove=None,
@@ -297,6 +307,7 @@ _table_formats = {"simple":
                               linebelow=None,
                               headerrow=partial(_moin_row_with_attrs,"||",header="'''"),
                               datarow=partial(_moin_row_with_attrs,"||"),
+                              footerrow=partial(_moin_row_with_attrs,"||",header="'''"),
                               padding=1, with_header_hide=None),
                   "html":
                   TableFormat(lineabove=_html_begin_table_without_header,
@@ -305,6 +316,7 @@ _table_formats = {"simple":
                               linebelow=Line("</tbody>\n</table>", "", "", ""),
                               headerrow=partial(_html_row_with_attrs, "th"),
                               datarow=partial(_html_row_with_attrs, "td"),
+                              footerrow=partial(_html_row_with_attrs, "td"),
                               padding=0, with_header_hide=["lineabove"]),
                   "latex":
                   TableFormat(lineabove=_latex_line_begin_tabular,
@@ -313,6 +325,7 @@ _table_formats = {"simple":
                               linebelow=Line("\\hline\n\\end{tabular}", "", "", ""),
                               headerrow=_latex_row,
                               datarow=_latex_row,
+                              footerrow=_latex_row,
                               padding=1, with_header_hide=None),
                   "latex_booktabs":
                   TableFormat(lineabove=partial(_latex_line_begin_tabular, booktabs=True),
@@ -321,18 +334,21 @@ _table_formats = {"simple":
                               linebelow=Line("\\bottomrule\n\\end{tabular}", "", "", ""),
                               headerrow=_latex_row,
                               datarow=_latex_row,
+                              footerrow=_latex_row,
                               padding=1, with_header_hide=None),
                   "tsv":
                   TableFormat(lineabove=None, linebelowheader=None,
                               linebetweenrows=None, linebelow=None,
                               headerrow=DataRow("", "\t", ""),
                               datarow=DataRow("", "\t", ""),
+                              footerrow=DataRow("", "\t", ""),
                               padding=0, with_header_hide=None),
                   "textile":
                   TableFormat(lineabove=None, linebelowheader=None,
                               linebetweenrows=None, linebelow=None,
                               headerrow=DataRow("|_. ", "|_.", "|"),
                               datarow=_textile_row_with_attrs,
+                              footerrow=DataRow("|_. ", "|_.", "|"),
                               padding=1, with_header_hide=None)}
 
 
@@ -354,6 +370,7 @@ def simple_separated_format(separator):
     return TableFormat(None, None, None, None,
                        headerrow=DataRow('', separator, ''),
                        datarow=DataRow('', separator, ''),
+                       footerrow=DataRow('', separator, ''),
                        padding=0, with_header_hide=None)
 
 
@@ -842,7 +859,7 @@ def _normalize_tabular_data(tabular_data, headers, showindex="default"):
     return rows, headers
 
 
-def tabulate(tabular_data, headers=(), tablefmt="simple",
+def tabulate(tabular_data, headers=(), footers=(), tablefmt="simple",
              floatfmt="g", numalign="decimal", stralign="left",
              missingval="", showindex="default"):
     """Format a fixed width table for pretty printing.
@@ -1137,10 +1154,22 @@ def tabulate(tabular_data, headers=(), tablefmt="simple",
         minwidths = [width_fn(c[0]) for c in cols]
         rows = list(zip(*cols))
 
+    if footers:
+        # align headers and add headers
+        t_cols = cols or [['']] * len(footers)
+        t_aligns = aligns or [stralign] * len(footers)
+        minwidths = [max(minw, width_fn(c[0])) for minw, c in zip(minwidths, t_cols)]
+        footers = [_align_header(h, a, minw, width_fn(h))
+                   for h, a, minw in zip(footers, t_aligns, minwidths)]
+        rows = list(zip(*cols))
+    else:
+        minwidths = [width_fn(c[0]) for c in cols]
+        rows = list(zip(*cols))
+
     if not isinstance(tablefmt, TableFormat):
         tablefmt = _table_formats.get(tablefmt, _table_formats["simple"])
 
-    return _format_table(tablefmt, headers, rows, minwidths, aligns)
+    return _format_table(tablefmt, headers, footers, rows, minwidths, aligns)
 
 
 def _build_simple_row(padded_cells, rowfmt):
@@ -1180,15 +1209,17 @@ def _pad_row(cells, padding):
         return cells
 
 
-def _format_table(fmt, headers, rows, colwidths, colaligns):
+def _format_table(fmt, headers, footers, rows, colwidths, colaligns):
     """Produce a plain-text representation of the table."""
     lines = []
     hidden = fmt.with_header_hide if (headers and fmt.with_header_hide) else []
     pad = fmt.padding
     headerrow = fmt.headerrow
+    footerrow = fmt.footerrow
 
     padded_widths = [(w + 2*pad) for w in colwidths]
     padded_headers = _pad_row(headers, pad)
+    padded_footers = _pad_row(footers, pad)
     padded_rows = [_pad_row(row, pad) for row in rows]
 
     if fmt.lineabove and "lineabove" not in hidden:
@@ -1213,7 +1244,12 @@ def _format_table(fmt, headers, rows, colwidths, colaligns):
     if fmt.linebelow and "linebelow" not in hidden:
         lines.append(_build_line(padded_widths, colaligns, fmt.linebelow))
 
-    if headers or rows:
+    if padded_footers:
+        if not (fmt.linebelow and "linebelow" not in hidden):
+            lines.append(_build_line(padded_widths, colaligns, fmt.linebelow))
+        lines.append(_build_row(padded_footers, padded_widths, colaligns, footerrow))
+
+    if headers or rows or footers:
         return "\n".join(lines)
     else: # a completely empty table
         return ""
